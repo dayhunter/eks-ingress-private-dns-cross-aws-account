@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: ui
+  name: workshopingress # name given to the ingress
+  annotations:
+    alb.ingress.kubernetes.io/load-balancer-name: myalb # user defined name given to the ALB
+    alb.ingress.kubernetes.io/scheme: internal # internet-facing # places the load balancer on public subnets
+    alb.ingress.kubernetes.io/target-type: ip # the Pod IPs should be used as the targets IPs; rather than the node IPs
+    alb.ingress.kubernetes.io/group.name: ui # allows multiple ingress resources to share a single ALB
+spec:
+  ingressClassName: alb # defines that this ingress will be owned by AWS Load Balancer Controller
+  rules:
+  - http:
+      paths:
+      - path: / # this rule applies to all requests that specifies this path
+        pathType: Prefix
+        backend:
+          service:
+            name: ui # route all these requests to this service
+            port:
+              number: 80 # route the requests to this port of the frontend service
